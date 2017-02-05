@@ -1,0 +1,118 @@
+# Data Request from NYC DoE for High School Application Process information.
+
+## What are your research objectives and the purpose of the study?
+
+The New York City Department of Education has a large challenge in efficiently and fairly placing students into high schools. The Department has used a large-scale matching algorithm which has been successful; 92% of students are matched and 85% are assigned to one of their top five choices. At the same time, New York City schools are highly racially segregated, with around half of all schools having a student body that is over 90% black and Latino. The goal of this work is to understand the root causes of this segregation. For example, are the rank lists of students self-selecting into racially homogenous schools? What is the impact of geography on student choice, and does the impact diverge across different demographic groups? Are there particular decision criteria associated with more or less segregation?
+
+Beyond understanding, the researchers will examine the impact of recently developed algorithms that seek to reduce bias across different groups. After applying these "de-biasing" algorithms, we will examine the impact on global utility. Is there a large impact on school assignments after de-biasing? Would these tweaked assignment schemes substantially change the number of students who receive their top 5 choices? What will the impact be on the schools: will there be a small or drastic change in assignments of the students the schools have ranked highly?
+
+The overall goal of this work is first and foremost add new information to the discussion of the the High School Assignment Process.
+
+
+## What is your research hypothesis and methodology for this work? 
+
+To conduct this research, we will need several pieces of information.
+1. The rank lists and assignments of students who entered the High School Admissions Program. We do NOT require any personally identifiable information about students, but it would be helpful to have this data associated with an anonymous unique ID.
+2. Biographic dataset files for the anonymous students. Namely, we would like to have ethnicity information about anonymized students. Anonymized home location data would additionally be useful (at a neighborhood or multiblock level) but is not necessary.
+3. If available, normalized information about the admissions criteria or requirements associated with each school.
+
+Given this data, the researchers will test a variety of hypotheses:
+* What is the impact of geography on rank lists? Do students apply to schools clustered in one area? Is there a difference in this across ethnicities, neighborhoods, or income levels?
+* Do different demographics rank schools differently? Are certain groups not ranking high quality schools, for fear of not being accepted or a misunderstanding of the match process?
+* What is the average school quality (as measured by the DoE in terms of student achievement) of schools on the rank lists of different demographic groups?
+
+We will additionally adapt a fairness algorithm (see Dwork et al. "Fairness through awareness." Proceedings of the 3rd Innovations in Theoretical Computer Science Conference. ACM, 2012.) and apply it to the match data. We will examine the impact on:
+- Schools: do schools receive substantially fewer of the students they ranked highly?
+- Students: what is the impact on number of students matched and average rank of assignment?
+- Segregation: does the algorithm actually decrease levels of segregation in NYC high schools?
+
+
+## What is your timeline for this work? Please describe key research activities and an estimated completion date.
+
+I believe the maximum amount of time required to conduct this work is two months.
+
+- Processing, cleaning, and developing initial understanding of the data (such as descriptive statistics) will take approximately one week. 
+- Analyzing impact of geography upon rank lists should take two weeks. We will look at geographic clustering behaviors of rank lists, determining if these are different for different demographic groups.
+- Analyzing the average school quality of schools on the rank list by demographic group will take another week.
+- The remainder of time (one month) will be spent on adapting and running a fairness algorithm on top of a matching algorithm.
+
+
+## Please provide a brief statement of the risks and benefits of the research.
+
+There are a variety of benefits to this work. We hope that our work could help inform the Department of Education on the behavior of students entering the High School Admissions Process. Our work should help show how students are making their decisions, which in turn could help the Department of Education in their communication with students, parents, schools, and other stakeholders.
+
+As more of modern society becomes governed by algorithmic decision-making, there is more risk of "algorithmic bias" creeping into the process. Recently, "fairness" or "de-biasing" processes have been proposed as counters to algorithms with societally undesirable results. However, these fairness processes have not been tested out in practice. This work would be one of the first attempts to move this work into the real world, analyzing if the results are practical or if they cause too much of degradation in overall utility to be effective.
+
+Given that this research does not require the use of personally identifiable information, and that no test subjects will be involved, we find there to be minimal risks.
+
+
+## Please provide a description of how the data will be used and the intended audience(s) for the findings.
+
+As described in the methodology section, we will use the data to answer the following questions:
+* What is the impact of geography on rank lists? Do students apply to schools clustered in one area? Is there a difference in this across ethnicities, neighborhoods, or income levels?
+* Do different demographics rank schools differently? Are certain groups not ranking high quality schools, for fear of not being accepted or a misunderstanding of the match process?
+* What is the average school quality (as measured by the DoE in terms of student achievement) of schools on the rank lists of different demographic groups?
+
+The data will be analyzed using code custom-written by a computer science PhD student at Columbia University. This will produce a variety of graphs and summary statistics illustrating the results of our work.
+
+There are two intended audiences for our findings. We would like to share any interesting findings with the Department of Education. Our results should help them better understand the behavior of applicants within the High School Admissions Process. If through our work on algorithmic fairness we obtain interesting results (whether positive or negative), we would like to share our results with the academic computer science community. This sharing will be done in the form of a paper which will not require the disclosure of any private data.
+
+
+## You must provide a detailed description of the data security plan to ensure protection of student and employee information including but not limited to data encryption, security of the transmission process, and provisions to prevent unauthorized access.
+
+We do not require personally identifiable information. All sensitive Department of Education data will be kept in an encrypted format on a computer located behind several locked doors in Columbia University. The data on this computer will only be accessible by me, who can log in using a password and private key. Security audits are regularly conducted by teams of experts at Columbia to insure that all computers (including the one that will be used) are not accessible by bad actors.
+
+There are a variety of ways we can insure a secure transmission process. Being located in New York, we could provide a city government regulation compliant hard drive to physically move the data. Otherwise, the Columbia University Information Technology team has experience dealing with secure data transfers of this kind will assist.
+
+
+## Please provide details on the data transmission including server address and log in credentials.
+
+Upon this request being approved, we are happy to set up an FTP server with the help of Columbia University Information Technology, or to physically provide a hard drive to the DoE.
+
+
+## Please provide an explicit timeline and description of how the data will be destroyed. 
+
+We hope to present our work as an academic publication in the computer science community. After presenting our week, we would like to retain the data for a period of time in order to answer and analyze follow-up questions that our presentation may generate. Thus, we would like to keep the data for up to one year after publication. After this period of time, we will delete the data from the secure server at Columbia, using a secure deletion program such as the unix commands "shred" or "wipe".
+
+
+
+
+
+
+
+## Please provide a general description of your data needs. You will be asked to explain in more detail in the following questions on this page.
+
+To conduct this research, we will need several pieces of information.
+1. The rank lists and assignments of students who entered the High School Admissions Program. We do NOT require any personally identifiable information about students, but it would be helpful to have this data associated with an anonymous unique ID.
+2. Biographic dataset files for the anonymous students, associated with the aforementioned anonymous unique ID. Namely, we would like to have ethnicity information about anonymized students. 
+3. (Optional) Anonymized home location data associated with the anonymous unique ID would additionally be useful (at a neighborhood or multiblock level) but is not necessary.
+4. (Optional) If available, normalized information about the admissions criteria or requirements associated with each school.
+
+
+## Years required
+2005 - 2016
+
+## Please provide an explanation for requesting data for these school years.
+We do *not* need all of the years requested.
+
+At a minimum, we need match data (as described in the previous question) for one year, from any of the years selected above.
+
+It would, however, be desirable to have data over several years to see if student ranking behavior has changed over time. For example, it might be interesting to have years 2005-2006, 2010-2011, and 2015-2016, analyzing if rank lists have change during these times.
+
+
+## Please select the grade levels for which you want data.
+7th grade - 12th grade
+
+
+## Please select from the list below the data types you are requesting.
+## Please provide an explanation for how each of the Data Types selected above supports your work.
+We do *not* require all files listed above to have a successful project. At a minimum we would need the "Student Demographic Data".
+
+Student Demographic Data would be used to associate rank list behavior with demographics, such as ethnicity, home language, birthplace, or ELL status.
+
+Additional data would be used for the following:
+* Student NY State Math and ELA data: used to see how student performance correlates with rank list behavior, or if some successful students in retrospect should have ranked more competitive schools higher..
+* Student Regents: used to see how student performance correlates with rank list behavior, or if some successful students in retrospect should have ranked more competitive schools higher..
+* Student Graduation: used to understand if certain ranking behaviors are associated with different outcomes, or if some successful students in retrospect should have ranked more competitive schools higher.
+* Student Attendance: used to understand if certain ranking behaviors are associated with different outcomes, or if some successful students in retrospect should have ranked more competitive schools higher.
+
