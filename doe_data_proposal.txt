@@ -19,9 +19,9 @@ Given this data, the researchers will test several hypotheses:
 - Is there a difference in the distribution of school quality for the rank lists for reduced/free lunch students versus non-free lunch students?
 - What is the impact of geography on rank lists? Do students apply to schools clustered in one area? Is there a difference in this between reduced/free lunch students versus non-free lunch students?
 
-We will additionally adapt a balancing algorithm (see Dwork et al., Proceedings of the 3rd Innovations in Theoretical Computer Science Conference. ACM, 2012.) and apply it to the match. We will examine the impact of this algorithm's match on both schools and students. More specifically:
-- Schools: do schools retain the the students they ranked highly? What is the impact on the average rank by schools of each of the assigned students?
-- Students: are more or fewer students matched at their top 5 choices? Do more or fewer students match anywhere? What is the quality of the schools the students are matched at?
+We will additionally adapt a balancing algorithm (see Dwork et al., Proceedings of the 3rd Innovations in Theoretical Computer Science Conference. ACM, 2012.) and apply it to the match data. This algorithm will provide a different, hypothetical match that can re-weight various student features during assignment. We will examine the impact of this algorithm's match on both schools and students. More specifically:
+- Schools: do schools retain the students they ranked highly? What is the impact on the average rank by schools of each of the assigned students?
+- Students: are more or fewer students matched at their top 5 choices? Do more or fewer students match anywhere? What is the overall quality of the schools at which students are matched?
 This will give us an idea of global utility, and see if and by how much it might decrease with the use of this algorithm.
 
 We will conduct this methodology by engaging in statistical analysis using data from the Department of Education.
@@ -32,14 +32,14 @@ We will conduct this methodology by engaging in statistical analysis using data 
 I believe the maximum amount of time required to conduct this work is two months.
 
 - Processing, cleaning, and developing initial understanding of the data (such as descriptive statistics) will take approximately one week.
-- Analyzing the average school quality of schools on the rank list by demographic group will take one week.
+- Analyzing the average rank list length and quality of schools on the rank list by student group will take one week.
 - Analyzing impact of geography upon rank lists should take two weeks. We will look at geographic clustering behaviors of rank lists, determining if these are different for different groups.
 - The remainder of time (one month) will be spent on adapting and running a fairness algorithm on top of a matching algorithm.
 
 
 ## Please provide a brief statement of the risks and benefits of the research.
 
-There are a variety of benefits to this work. We hope that our work will help inform the Department of Education, and non-profits on the behavior of students entering the High School Admissions Process. Our work should help show how students are making their decisions, which in turn will help non-profits in their communication with students, parents, schools, and other stakeholders, helping New York City high schoolers in the important process of selecting a high school.
+There are a variety of benefits to this work. We hope that our work will help inform the Department of Education and non-profits on the behavior of students entering the High School Admissions Process. Our work should help show how students are making their decisions, which in turn will help non-profits in their communication with students, parents, schools, and other stakeholders, helping New York City high schoolers in the important process of selecting a high school.
 
 Given that this research does not require the use of personally identifiable information, and that no test subjects will be involved, we find there to be minimal risks.
 
@@ -54,14 +54,14 @@ As described in the methodology section, we will use the data to answer the foll
 
 The data will be analyzed using code custom-written by a computer science PhD student at Columbia University. This will produce a variety of graphs and summary statistics illustrating the results of our work.
 
-There are three intended audiences for our findings. We would like to share our work with non-profits who support students preparing to be assigned to New York City high schools. Our results should help them to  understand better the behavior of applicants within the High School Admissions Process. We would also like to share our findings with the Department of Education. If our work on algorithmic balancing yields interesting results, we would like to share our results with the academic computer science community in the form of an academic paper which will not require the disclosure of any private data.
+There are three intended audiences for our findings. We would like to share our work with non-profits who support students preparing to be assigned to New York City high schools. Our results should help them to understand better the behavior of applicants within the High School Admissions Process. We would also like to share our findings with the Department of Education. If our work on algorithmic balancing yields interesting results, we would like to share our results with the academic computer science community in the form of an academic paper which will not require the disclosure of any private data.
 
 
 ## You must provide a detailed description of the data security plan to ensure protection of student and employee information including but not limited to data encryption, security of the transmission process, and provisions to prevent unauthorized access.
 
 We do not require personally identifiable information. All sensitive Department of Education data will be kept in an encrypted format on a computer located behind several locked doors in Columbia University. The data on this computer will only be accessible to me, via secure log in with a password and private key. Security audits are regularly conducted by teams of experts at Columbia to insure that all computers (including the one that will be used) are not accessible by bad actors.
 
-There are a variety of ways we can insure a secure transmission process. We are located in New York and could provide a city government regulation compliant hard drive to physically move the data. Otherwise, the Columbia University Information Technology team has expertise in dealing with secure data transfers of this kind will assist.
+There are a variety of ways we can insure a secure transmission process. We are located in New York and could provide a city government regulation compliant hard drive to physically move the data. Otherwise, the Columbia University Information Technology team has expertise in dealing with secure data transfers of this kind and will assist. Additionally, I have technical experience with FTP and can set up a necessary connection.
 
 
 ## Please provide details on the data transmission including server address and log in credentials.
