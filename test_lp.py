@@ -5,6 +5,7 @@
 """Play with some linear programs to understand "Fairness Through Awareness"."""
 
 import itertools
+import random
 
 import numpy as np
 from scipy import optimize
@@ -30,6 +31,10 @@ def get_outcome_variables(x, num_outcomes=NUM_OUTCOMES):
 
 
 def generate_outcome_constraints(x, num_outcomes=NUM_OUTCOMES):
+  """These variables represent the weight to put on each ad for a given user.
+  There are several constraints to insure that the distribution adds up to 1 and
+  that the weight on each ad is greater than or equal to 0. 
+  """
   variable_names = get_outcome_variables(x, num_outcomes)
   # Make sure variables equal 1 exactly
   e1 = {v : 1 for v in variable_names}
@@ -133,13 +138,25 @@ def create_example_loss3():
           "a0_x1": -1.5, "a1_x1": 0,
           "a0_x2": -3, "a1_x2": -2,}
 
+def create_random_loss_fcn(num_ppl=NUM_PPL, num_outcomes=NUM_OUTCOMES):
+  def random_loss_fcn():
+    out_dict = {}
+    ppl = get_individuals(num_ppl)
+    for person in ppl:
+      outcomes = get_outcome_variables(person, num_outcomes)
+      for outcome in outcomes:
+        out_dict[outcome] = -1 * random.random()
+    return out_dict
+  return random_loss_fcn
+
 
 def print_weights(output):
   """Prints the weights on the outcomes for each user.
 
   Output must be augmented with feature names
   """
-  feature_map = {ftr: val for ftr, val in zip(feature_names[:-1], output.x)}
+  feature_map = {ftr: val for ftr, val 
+      in zip(output.feature_names[:-1], output.x)}
   ppl = sorted(list(set([name.rsplit("_")[-1] for name in output.feature_names])))
   ppl.remove("result")
   for person in ppl:
@@ -162,8 +179,24 @@ def run_test2():
   print()
   return output
 
+def run_exp(num_ppl=NUM_PPL, num_outcomes=NUM_OUTCOMES):
+  loss_fcn = create_random_loss_fcn(num_ppl, num_outcomes)
+  # print(len(loss_fcn()), loss_fcn())
+
+  loss_vect, constraints_matrix, b, feature_names = generate_lp(
+      loss_fcn, num_ppl, num_outcomes, CONSTANT_METRIC,
+      generate_distribution_tv_constraints)
+
+  output = optimize.linprog(loss_vect, constraints_matrix, b)
+  output["feature_names"] = feature_names
+  # print(output)
+
+  print_weights(output)
+  return output
+
+
 loss_vect, constraints_matrix, b, feature_names = generate_lp(
-    create_example_loss, NUM_PPL+1, NUM_OUTCOMES, CONSTANT_METRIC,
+    create_random_loss, NUM_PPL, NUM_OUTCOMES, CONSTANT_METRIC,
     generate_distribution_tv_constraints)
 
 output = optimize.linprog(loss_vect, constraints_matrix, b)
