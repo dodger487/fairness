@@ -1,0 +1,141 @@
+Iteration 0
+Number of cells: 2
+0 0.415384817467 0.375381165919 0.5
+wrote ../data/dists/nyc_fash_race_0.csv
+
+Iteration 0.5
+Number of cells: 4
+0.5 0.415743646634 0.375381165919 0.5
+wrote ../data/dists/nyc_fash_race_0_5.csv
+
+Iteration 1
+Number of cells: 34
+1 0.463092682438 0.375381165919 0.580305574349
+wrote ../data/dists/nyc_fash_race_1.csv
+
+Iteration 1.5
+Number of cells: 109
+1.5 0.483682593358 0.375381165919 0.604064940739
+wrote ../data/dists/nyc_fash_race_1_5.csv
+
+Iteration 2
+Number of cells: 1788
+2 0.525894212743 0.375381165919 0.634150467413
+wrote ../data/dists/nyc_fash_race_2.csv
+
+Iteration 2.5
+Number of cells: 5163
+2.5 0.552519602731 0.375381165919 0.65827101411
+wrote ../data/dists/nyc_fash_race_2_5.csv
+
+Iteration 3
+Number of cells: 25830
+3 0.555370892306 0.375381165919 0.766831085243
+wrote ../data/dists/nyc_fash_race_3.csv
+
+Iteration 3.5
+Number of cells: 41247
+3.5 0.567294521821 0.375381165919 0.796966834624
+wrote ../data/dists/nyc_fash_race_3_5.csv
+
+Iteration 4
+Number of cells: 82993
+4 0.556570467405 0.375381165919 0.824331243501
+wrote ../data/dists/nyc_fash_race_4.csv
+
+
+
+Iteration 0
+Number of cells: 2
+0 0.156960769391 0.143228699552 0.5
+wrote ../data/dists/nyc_health_race_0.csv
+
+Iteration 0.5
+Number of cells: 4
+0.5 0.156871854386 0.143228699552 0.5
+wrote ../data/dists/nyc_health_race_0_5.csv
+
+Iteration 1
+Number of cells: 34
+1 0.19525563335 0.143228699552 0.928404861205
+wrote ../data/dists/nyc_health_race_1.csv
+
+Iteration 1.5
+Number of cells: 109
+1.5 0.191361875065 0.143228699552 0.728488111261
+wrote ../data/dists/nyc_health_race_1_5.csv
+
+Iteration 2
+Number of cells: 1788
+2 0.220546171202 0.143228699552 0.871260261921
+wrote ../data/dists/nyc_health_race_2.csv
+
+Iteration 2.5
+Number of cells: 5163
+2.5 0.241513043671 0.143228699552 0.841781638695
+wrote ../data/dists/nyc_health_race_2_5.csv
+
+Iteration 3
+Number of cells: 25830
+3 0.250622241203 0.143228699552 0.93108519897
+wrote ../data/dists/nyc_health_race_3.csv
+
+Iteration 3.5
+Number of cells: 41247
+3.5 0.254715537581 0.143228699552 0.929386911183
+wrote ../data/dists/nyc_health_race_3_5.csv
+
+Iteration 4
+Number of cells: 82993
+4 0.244711792143 0.143228699552 0.929348314607
+wrote ../data/dists/nyc_health_race_4.csv
+
+
+
+Iteration 0
+Number of cells: 2
+0 0.510594701337 0.46 0.5
+wrote ../data/dists/nyc_travel_race_0.csv
+
+Iteration 0.5
+Number of cells: 4
+0.5 0.510269848152 0.46 0.5
+wrote ../data/dists/nyc_travel_race_0_5.csv
+
+Iteration 1
+Number of cells: 34
+1 0.557960801138 0.46 0.561759451675
+wrote ../data/dists/nyc_travel_race_1.csv
+
+Iteration 1.5
+Number of cells: 109
+1.5 0.575997711888 0.46 0.57441642343
+wrote ../data/dists/nyc_travel_race_1_5.csv
+
+Iteration 2
+Number of cells: 1788
+2 0.618253792686 0.46 0.598715283006
+wrote ../data/dists/nyc_travel_race_2.csv
+
+Iteration 2.5
+Number of cells: 5163
+2.5 0.622295030538 0.46 0.608652202631
+wrote ../data/dists/nyc_travel_race_2_5.csv
+
+Iteration 3
+Number of cells: 25830
+3 0.631245152149 0.46 0.637159883408
+wrote ../data/dists/nyc_travel_race_3.csv
+
+Iteration 3.5
+Number of cells: 41247
+3.5 0.630079668784 0.46 0.64559151435
+wrote ../data/dists/nyc_travel_race_3_5.csv
+
+Iteration 4
+Number of cells: 82993
+4 0.619107289253 0.46 0.655460386439
+wrote ../data/dists/nyc_travel_race_4.csv
+
+
+
