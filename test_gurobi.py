@@ -13,6 +13,7 @@
 import math
 import random
 
+from dplython import *
 from gurobipy import *
 import numpy as np
 import pandas as pd
@@ -136,6 +137,15 @@ def get_person_loss(df, person, generic_loss, specific_loss):
   return (-1 * 1 * generic_loss  * person.outcomes[0] +
           -1 *   prob   * specific_loss * person.outcomes[1])
 
+def get_expected_ctr(df, person):
+  """TODO"""
+  prob = df[df.userid == int(person.uid)].prob.iloc[0]  # Probability in specific
+  return prob * person.outcomes[1]
+
+
+def get_prob(df, uid):
+  return df[df.userid == int(uid)].prob.iloc[0]  # Probability in specific
+
 
 def get_uid_to_idx(uid_fname):
   uids = np.load(uid_fname)
@@ -146,7 +156,8 @@ def get_dtv_saved(mat, uid1, uid2, uid_to_idx):
   return mat[uid_to_idx[int(uid1)]][uid_to_idx[int(uid2)]]
 
 
-def run_model_from_df(df, dist_mat, uid_to_idx, num_ppl=10, num_outcomes=2, K=1):
+def run_model_from_df(df, dist_mat, uid_to_idx, num_ppl=10, num_outcomes=2, K=1,
+                      verbose=False, is_fair=True):
   """Runs Dwork on real user data, supplied with a dataframe"""
 
   # Create a new model
@@ -154,42 +165,47 @@ def run_model_from_df(df, dist_mat, uid_to_idx, num_ppl=10, num_outcomes=2, K=1)
 
   # Create people objects
   # TODO: random seed is set!!!
-  random.seed(1337)
-  ppl_names = [str(uid) for uid in list(df["userid"]) if uid in uid_to_idx]
-  ppl_names = random.sample(ppl_names, num_ppl)
+  # random.seed(1337)
+  # ppl_names = [str(uid) for uid in list(df["userid"]) if uid in uid_to_idx]
+  # print(len(ppl_names))
+  # ppl_names = random.sample(ppl_names, num_ppl)
   # ppl_names = df.sample(num_ppl, random_state=1337)["userid"].values.astype(str)
-  print(ppl_names)
-  ppl = [Person(m, p, num_outcomes) for p in ppl_names]
+  # print(ppl_names)
+  ppl = [Person(m, p, num_outcomes) for p in df.userid.values.astype(str)[:num_ppl]]
+  # ppl = [Person(m, p, num_outcomes) for p in ppl_names]
   ppl_pairs = itertools.combinations(ppl, num_outcomes)
 
   # Update so that variable names are available in next step
   m.update()
 
-  # coords = df.columns.difference(["userid", "prob"])
-  # coords = list(map(str_to_tuple, coords))
-  # dist = create_distance_matrix(coords) * 111  # The 111 is lat-lon to KM
-
   # Set fairness constraint
-  for person_x, person_y in ppl_pairs:
-    diff = get_dtv_saved(dist_mat, person_x.uid, person_y.uid, uid_to_idx)
-    # diff = get_dtv(df, person_x.uid, person_y.uid)
-    # diff = get_emd(df, person_x.uid, person_y.uid, dist)
-    # print(diff)
-    generate_distribution_tv_constraints_obj(m, person_x, person_y, diff, K=K)
+  if is_fair:
+    for person_x, person_y in ppl_pairs:
+      diff = get_dtv_saved(dist_mat, person_x.uid, person_y.uid, uid_to_idx)
+      generate_distribution_tv_constraints_obj(m, person_x, person_y, diff, K=K)
 
   # Set objective
+  ## Old objective: minimize negative revenue (aka maximize revenue)
   success_outcomes = [get_person_loss(df, p, 1.00, 2.00) for p in ppl]
-
   m.setObjective(quicksum(success_outcomes), GRB.MINIMIZE)
+  ## New objective: minimize impressions subject to 1000 expected clicks
+  # m.setObjective(quicksum([p.outcomes[1] for p in ppl]), GRB.MINIMIZE)
+  # m.addConstr(quicksum([get_expected_ctr(df, p) for p in ppl]) >= 1)
 
   m.optimize()
 
-  # for v in m.getVars():
-  #   if "abs" in v.varName:
-  #     continue
-  #   print('%s %g' % (v.varName, v.x))
+  if verbose:
+    for v in m.getVars():
+      if "abs" in v.varName:
+        continue
+      if "_a1" in v.varName:
+        uid = v.varName.split("_")[0]
+        print('%s\t%g\t%g' % (v.varName, v.x, get_prob(df, uid)))
+      # print('%s %g' % (v.varName, v.x))
 
   print('Obj: %g' % m.objVal)
+
+  return m
 
 
 
@@ -238,13 +254,208 @@ def run_model(num_ppl, num_outcomes):
   #   print('Error code ' + str(e.errno) + ": " + str(e))
 
   # except AttributeError:
-  #   print('Encountered an attribute error')
+  #    print('Encountered an attribute error')
+  # -204.5
+  # -200
+
+def augment(df, m):
+  df_out = DplyFrame(df)
+  df_out = df_out >> arrange(X.userid)
+  a1s = [v for v in m.getVars() if re.match("^\d+_a1", v.varName) is not None]
+  lp_df_out = DplyFrame([(int(v.varName.split("_")[0]), v.x) for v in a1s],
+                    columns=["userid", "a1"])
+  df_out = inner_join(df_out, lp_df_out)
+  df_out = df_out >> mutate(gain = X.a1 * X.result)
+  return(df_out)
+
+
+def run_multi_k(df, dist_mat, uid_to_idx, num_ppl=902):
+  """TODO"""
+  base_df = df >> select(X.userid, X.prob, X.result, X.race)
+
+  model_unfair = run_model_from_df(df, dist_mat, uid_to_idx, num_ppl=num_ppl, 
+                                   num_outcomes=2, is_fair=False)
+  results = augment(base_df, model_unfair)
+  results["k"] = "unfair"
+
+  for k in [0, 0.5, 1, 2, 10]:
+    model_out = run_model_from_df(df, dist_mat, uid_to_idx, num_ppl=num_ppl, 
+                                  num_outcomes=2, K=k)
+    this_df = augment(base_df, model_out)
+    this_df["k"] = k
+    results = results.append(this_df)
+
+  return results
+
+
+gran_to_info = {
+  0 : ("dists_nyc_race_0.npy", "uids_nyc_race_0.npy"),
+  0.5 : ("dists_nyc_race_0_5.npy", "uids_nyc_race_0_5.npy"),
+  1 : ("dists_nyc_race_1.npy", "uids_nyc_race_1.npy"),
+  1.5 : ("dists_nyc_race_1_5.npy", "uids_nyc_race_1_5.npy"),
+  2 : ("dists_nyc_race_2.npy", "uids_nyc_race_2.npy"),
+  2.5 : ("dists_nyc_race_2_5.npy", "uids_nyc_race_2_5.npy"),
+  3 : ("dists_nyc_race_3.npy", "uids_nyc_race_3.npy"),
+  3.5 : ("dists_nyc_race_3_5.npy", "uids_nyc_race_3_5.npy"),
+  4 : ("dists_nyc_race_4.npy", "uids_nyc_race_4.npy"), 
+}
+
+gran_to_info_la = {
+  0 : ("dists_la_race_0.npy", "uids_la_race_0.npy"),
+  0.5 : ("dists_la_race_0_5.npy", "uids_la_race_0_5.npy"),
+  1 : ("dists_la_race_1.npy", "uids_la_race_1.npy"),
+  1.5 : ("dists_la_race_1_5.npy", "uids_la_race_1_5.npy"),
+  2 : ("dists_la_race_2.npy", "uids_la_race_2.npy"),
+  2.5 : ("dists_la_race_2_5.npy", "uids_la_race_2_5.npy"),
+  3 : ("dists_la_race_3.npy", "uids_la_race_3.npy"),
+  3.5 : ("dists_la_race_3_5.npy", "uids_la_race_3_5.npy"),
+  4 : ("dists_la_race_4.npy", "uids_la_race_4.npy"), 
+}
+
+def run_all(df):
+  all_results = DplyFrame()  # All results will go here
+
+  # For each granularity
+  for gran in sorted(list(set(df.gran))):
+    # Get data for this granularity
+    this_df = df[df.gran == gran]
+    print()
+    print()
+    print("Gran:", gran)
+    print("Number of users:", len(this_df))
+
+    # Load distance matrix
+    dist_mat_fname, uid_fname = gran_to_info[gran]
+    dist_mat_fname = "/Users/chris/Documents/instagramface/data/dists/" + dist_mat_fname
+    uid_fname = "/Users/chris/Documents/instagramface/data/dists/" + uid_fname
+    dist_mat = np.load(dist_mat_fname)
+    uid_to_idx = get_uid_to_idx(uid_fname)
+
+    # Calculate results at this granularity
+    gran_results = run_multi_k(this_df, dist_mat, uid_to_idx)
+    gran_results["gran"] = gran
+
+    # Aggregate results
+    all_results = all_results.append(gran_results)
+
+  return all_results
+
+
+def run_nyc():
+  all_results = DplyFrame()  # All results will go here
+
+  fash_df   = DplyFrame(pd.read_csv("~/Documents/instagramface/data/dists/nyc_fash_race_all.csv"))
+  health_df = DplyFrame(pd.read_csv("~/Documents/instagramface/data/dists/nyc_health_race_all.csv"))
+  travel_df = DplyFrame(pd.read_csv("~/Documents/instagramface/data/dists/nyc_travel_race_all.csv"))
+  fash_df["tag"]= "fashion"
+
+  for df in [fash_df, health_df, travel_df]:
+    # "fashion" alerady done
+    # For each granularity
+    for gran in sorted(list(set(df.gran))):
+      # Get data for this granularity
+      this_df = df[df.gran == gran]
+      print()
+      print()
+      print("Tag:", this_df.iloc[0]["tag"])
+      print("Gran:", gran)
+      print("Number of users:", len(this_df))
+      print()
+      print()
+
+      # Load distance matrix
+      dist_mat_fname, uid_fname = gran_to_info[gran]
+      dist_mat_fname = "/Users/chris/Documents/instagramface/data/dists/" + dist_mat_fname
+      uid_fname = "/Users/chris/Documents/instagramface/data/dists/" + uid_fname
+      dist_mat = np.load(dist_mat_fname)
+      uid_to_idx = get_uid_to_idx(uid_fname)
+
+      # Calculate results at this granularity
+      gran_results = run_multi_k(this_df, dist_mat, uid_to_idx)
+      gran_results["tag"] = this_df.iloc[0]["tag"]
+      gran_results["gran"] = gran
+
+      # Aggregate results
+      all_results = all_results.append(gran_results)
+
+  return all_results
+
+
+def run_all_nyc():
+  # df = DplyFrame(pd.read_csv("~/Documents/instagramface/data/dists/nyc_fash_race_all.csv"))
+  # all_results = run_all(df)
+  # fash_results = pd.read_csv("nyc_fashion_results.csv")
+  # fash_results["tag"] = "fashion"
+  all_results = run_nyc()
+  # all_results.to_csv("nyc_healthtravel_results.csv", index=False)
+  # all_results = all_results.append(fash_results)
+  all_results.to_csv("nyc_all_results.csv", index=False)
+  return all_results
+
+
+def run_all_tags(input_df):
+  all_results = DplyFrame()  # All results will go here
+
+  for tag in ["fashion", "travel", "health"]:
+    df = input_df[input_df.tag == tag]
+
+    # For each granularity
+    for gran in sorted(list(set(df.gran))):
+      # Get data for this granularity
+      this_df = df[df.gran == gran]
+      print()
+      print()
+      print("Gran:", gran)
+      print("Number of users:", len(this_df))
+
+      # Load distance matrix
+      dist_mat_fname, uid_fname = gran_to_info_la[gran]
+      dist_mat_fname = "/Users/chris/Documents/instagramface/data/dists/" + dist_mat_fname
+      uid_fname = "/Users/chris/Documents/instagramface/data/dists/" + uid_fname
+      dist_mat = np.load(dist_mat_fname)
+      uid_to_idx = get_uid_to_idx(uid_fname)
+
+      # Calculate results at this granularity
+      gran_results = run_multi_k(this_df, dist_mat, uid_to_idx)
+      gran_results["tag"] = this_df.iloc[0]["tag"]
+      gran_results["gran"] = gran
+
+      # Aggregate results
+      all_results = all_results.append(gran_results)
+
+  return all_results
+
+
+def run_all_la():
+  la = DplyFrame(pd.read_csv("/Users/chris/Documents/instagramface/data/dists/la_race_all.csv"))
+  all_results = run_all_tags(la)
+  all_results.to_csv("la_all_results.csv", index=False)
+  return all_results
 
 
 if __name__ == '__main__':
-  df = pd.read_csv("korea_wide_test.csv")
+  res = run_all_nyc()
+
+
+# if __name__ == '__main__':
+def old_main():
+  df = pd.read_csv("~/Documents/instagramface/data/dists/nyc_fash_race_2_2.csv")
   # run_model_from_df(df, num_ppl=900)
   dist_mat = np.load("/Users/chris/Documents/instagramface/data/dists/dists_nyc_race_1_5.npy")
   uid_to_idx = get_uid_to_idx("/Users/chris/Documents/instagramface/data/dists/uids_nyc_race.npy")
-  run_model_from_df(df, dist_mat, uid_to_idx, num_ppl=10, num_outcomes=2, K=1)
+  
+  model_unfiar = run_model_from_df(df, dist_mat, uid_to_idx, num_ppl=902, num_outcomes=2, is_fair=False)
+
+  base_df = df >> select(X.userid, X.prob, X.result, X.race)
+
+  results = DplyFrame()
+  for k in [0, 0.5, 1, 2, 10]:
+    model_out = run_model_from_df(df, dist_mat, uid_to_idx, num_ppl=902, 
+                                  num_outcomes=2, K=k)
+    this_df = augment(base_df, model_out)
+    this_df["k"] = k
+    results.append(this_df)
+
+
+
   # run_model(1000, NUM_OUTCOMES)
